@@ -344,8 +344,7 @@ That keeps the runtime on compiled offsets instead of rediscovering the contract
 
 `--> ["data lint"]`
 
-There is a real data linter.
-Not fake decoration. Not vague advice. It judges the reliquary shape itself.
+There is a data linter.
 
 ## strict
 
