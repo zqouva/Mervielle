@@ -7,8 +7,8 @@ local BUFFER_TO_STRING = buffer.tostring
 local BUFFER_FROM_STRING = buffer.fromstring
 
 local ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
-local CHAR_BY_VALUE: {[number]: string} = {}
-local VALUE_BY_CHAR: {[number]: number} = {}
+local CHAR_BY_VALUE: { [number]: string } = {}
+local VALUE_BY_CHAR: { [number]: number } = {}
 
 for index = 1, #ALPHABET do
 	local byte = string.byte(ALPHABET, index)
@@ -91,12 +91,7 @@ local function decodeBase64(encoded: string, exactLength: number?): buffer
 		local v3 = if c3 == string.byte("=") then 0 else (VALUE_BY_CHAR[c3] or 0)
 		local v4 = if c4 == string.byte("=") then 0 else (VALUE_BY_CHAR[c4] or 0)
 
-		local packed = bit32.bor(
-			bit32.lshift(v1, 18),
-			bit32.lshift(v2, 12),
-			bit32.lshift(v3, 6),
-			v4
-		)
+		local packed = bit32.bor(bit32.lshift(v1, 18), bit32.lshift(v2, 12), bit32.lshift(v3, 6), v4)
 
 		if write < outputLength then
 			buffer.writeu8(out, write, bit32.band(bit32.rshift(packed, 16), 0xFF))
@@ -130,6 +125,10 @@ function Codec.encode(source: buffer, length: number): string
 	return encodeBase64(source, length)
 end
 
+function Codec.encodeStorage(source: buffer, length: number): string
+	return encodeBase64(source, length)
+end
+
 function Codec.decode(encoded: any, exactLength: number?): buffer
 	if typeof(encoded) == "buffer" then
 		if exactLength == nil or buffer.len(encoded) == exactLength then
@@ -143,6 +142,25 @@ function Codec.decode(encoded: any, exactLength: number?): buffer
 	assert(type(encoded) == "string", "[Merveille/Codec] expected string or buffer payload")
 
 	if BUFFER_FROM_STRING ~= nil and exactLength ~= nil and #encoded == exactLength then
+		return BUFFER_FROM_STRING(encoded)
+	end
+
+	return decodeBase64(encoded, exactLength)
+end
+
+function Codec.decodeStorage(encoded: any, exactLength: number?): buffer
+	if typeof(encoded) == "buffer" then
+		if exactLength == nil or buffer.len(encoded) == exactLength then
+			return encoded
+		end
+		local resized = buffer.create(exactLength)
+		copyPrefix(resized, encoded, math.min(exactLength, buffer.len(encoded)))
+		return resized
+	end
+
+	assert(type(encoded) == "string", "[Merveille/Codec] expected string or buffer payload")
+
+	if exactLength ~= nil and #encoded == exactLength and BUFFER_FROM_STRING ~= nil then
 		return BUFFER_FROM_STRING(encoded)
 	end
 

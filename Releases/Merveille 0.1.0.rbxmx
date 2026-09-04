@@ -2,13 +2,14 @@
 	<Meta name="ExplicitAutoJoints">true</Meta>
 	<External>null</External>
 	<External>nil</External>
-	<Item class="ModuleScript" referent="RBX6027bef714140faf">
+	<Item class="ModuleScript" referent="RBX2f6f0d47981db312">
 		<Properties>
 			<BinaryString name="AttributesSerialize"></BinaryString>
 			<SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
 			<bool name="DefinesCapabilities">false</bool>
 			<string name="Name">MerveilleData</string>
-			<ProtectedString name="Source">--!strict
+			<ProtectedString name="Source">-- [Merveille Core Runtime v0.1.0]
+--!strict
 --[[
 	--&gt; ["Merveille : v.0.1.0 : the beginning..."]
 	made by Makel/Savi(@sacredludt or @.makel)
@@ -235,7 +236,7 @@ return table.freeze(Merveille)
 			<int64 name="SourceAssetId">-1</int64>
 			<BinaryString name="Tags"></BinaryString>
 		</Properties>
-		<Item class="Folder" referent="RBXc3c3cb1b0b774e4d">
+		<Item class="Folder" referent="RBX026f48cf9f565ca3">
 			<Properties>
 				<BinaryString name="AttributesSerialize"></BinaryString>
 				<SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
@@ -244,7 +245,7 @@ return table.freeze(Merveille)
 				<int64 name="SourceAssetId">-1</int64>
 				<BinaryString name="Tags"></BinaryString>
 			</Properties>
-			<Item class="ModuleScript" referent="RBX481a1208380d35cf">
+			<Item class="ModuleScript" referent="RBX246d1c1e83e1e9c0">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
@@ -349,7 +350,7 @@ return table.freeze(Merveille)
 					<BinaryString name="Tags"></BinaryString>
 				</Properties>
 			</Item>
-			<Item class="ModuleScript" referent="RBXb93f6241ae20b0f7">
+			<Item class="ModuleScript" referent="RBX7d0d38fb82b28b27">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
@@ -388,7 +389,7 @@ return table.freeze(Merveille)
 					<BinaryString name="Tags"></BinaryString>
 				</Properties>
 			</Item>
-			<Item class="ModuleScript" referent="RBXfad91146b026efff">
+			<Item class="ModuleScript" referent="RBX1779b30a502b04e2">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
@@ -403,8 +404,8 @@ return table.freeze(Merveille)
 		local BUFFER_FROM_STRING = buffer.fromstring
 		
 		local ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
-		local CHAR_BY_VALUE: {[number]: string} = {}
-		local VALUE_BY_CHAR: {[number]: number} = {}
+		local CHAR_BY_VALUE: { [number]: string } = {}
+		local VALUE_BY_CHAR: { [number]: number } = {}
 		
 		for index = 1, #ALPHABET do
 			local byte = string.byte(ALPHABET, index)
@@ -487,12 +488,7 @@ return table.freeze(Merveille)
 				local v3 = if c3 == string.byte("=") then 0 else (VALUE_BY_CHAR[c3] or 0)
 				local v4 = if c4 == string.byte("=") then 0 else (VALUE_BY_CHAR[c4] or 0)
 		
-				local packed = bit32.bor(
-					bit32.lshift(v1, 18),
-					bit32.lshift(v2, 12),
-					bit32.lshift(v3, 6),
-					v4
-				)
+				local packed = bit32.bor(bit32.lshift(v1, 18), bit32.lshift(v2, 12), bit32.lshift(v3, 6), v4)
 		
 				if write &lt; outputLength then
 					buffer.writeu8(out, write, bit32.band(bit32.rshift(packed, 16), 0xFF))
@@ -526,6 +522,10 @@ return table.freeze(Merveille)
 			return encodeBase64(source, length)
 		end
 		
+		function Codec.encodeStorage(source: buffer, length: number): string
+			return encodeBase64(source, length)
+		end
+		
 		function Codec.decode(encoded: any, exactLength: number?): buffer
 			if typeof(encoded) == "buffer" then
 				if exactLength == nil or buffer.len(encoded) == exactLength then
@@ -545,13 +545,32 @@ return table.freeze(Merveille)
 			return decodeBase64(encoded, exactLength)
 		end
 		
+		function Codec.decodeStorage(encoded: any, exactLength: number?): buffer
+			if typeof(encoded) == "buffer" then
+				if exactLength == nil or buffer.len(encoded) == exactLength then
+					return encoded
+				end
+				local resized = buffer.create(exactLength)
+				copyPrefix(resized, encoded, math.min(exactLength, buffer.len(encoded)))
+				return resized
+			end
+		
+			assert(type(encoded) == "string", "[Merveille/Codec] expected string or buffer payload")
+		
+			if exactLength ~= nil and #encoded == exactLength and BUFFER_FROM_STRING ~= nil then
+				return BUFFER_FROM_STRING(encoded)
+			end
+		
+			return decodeBase64(encoded, exactLength)
+		end
+		
 		return table.freeze(Codec)
 		</ProtectedString>
 					<int64 name="SourceAssetId">-1</int64>
 					<BinaryString name="Tags"></BinaryString>
 				</Properties>
 			</Item>
-			<Item class="ModuleScript" referent="RBX0e49378da19afe99">
+			<Item class="ModuleScript" referent="RBXd2220b27a3bc325b">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
@@ -1055,7 +1074,7 @@ return table.freeze(Merveille)
 					<BinaryString name="Tags"></BinaryString>
 				</Properties>
 			</Item>
-			<Item class="ModuleScript" referent="RBX4140bbd039f2370a">
+			<Item class="ModuleScript" referent="RBX91cd7e62ce5c7f35">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
@@ -1083,15 +1102,13 @@ return table.freeze(Merveille)
 					<BinaryString name="Tags"></BinaryString>
 				</Properties>
 			</Item>
-			<Item class="ModuleScript" referent="RBX8dc152c51925dcbb">
+			<Item class="ModuleScript" referent="RBX9a92ecaa3f4c2359">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
 					<bool name="DefinesCapabilities">false</bool>
 					<string name="Name">Lint</string>
-					<ProtectedString name="Source">--!strict
-		
-		--&gt;	["lint"]
+					<ProtectedString name="Source">--&gt;	["lint"]
 		--&gt;	Data linting for reliquary definitions.
 		--&gt;	Modes:
 		--&gt;	- strict: pushes hard on structural certainty and property-safe naming
@@ -1392,7 +1409,9 @@ return table.freeze(Merveille)
 				addIssue(report, "error", "default-integer", `default for {scalar} must be an integer`, path)
 				return
 			end
-			if limit ~= nil and (value &lt; limit.min or value &gt; limit.max) then
+			local minValue = if limit ~= nil then limit.min else nil
+			local maxValue = if limit ~= nil then limit.max else nil
+			if (minValue ~= nil and value &lt; minValue) or (maxValue ~= nil and value &gt; maxValue) then
 				addIssue(report, "error", "default-range", `default for {scalar} is out of range`, path)
 				return
 			end
@@ -2119,7 +2138,7 @@ return table.freeze(Merveille)
 					<BinaryString name="Tags"></BinaryString>
 				</Properties>
 			</Item>
-			<Item class="ModuleScript" referent="RBX51aa77840a802e61">
+			<Item class="ModuleScript" referent="RBX5ba93d653575fcf1">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
@@ -2526,7 +2545,7 @@ return table.freeze(Merveille)
 					<BinaryString name="Tags"></BinaryString>
 				</Properties>
 			</Item>
-			<Item class="ModuleScript" referent="RBX7c0fb929cef9dc69">
+			<Item class="ModuleScript" referent="RBX13ea40da6d2a79c8">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
@@ -2609,7 +2628,7 @@ return table.freeze(Merveille)
 					<BinaryString name="Tags"></BinaryString>
 				</Properties>
 			</Item>
-			<Item class="ModuleScript" referent="RBXbd41bf6d03928175">
+			<Item class="ModuleScript" referent="RBXe0bfc54ae708934e">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
@@ -2866,7 +2885,7 @@ return table.freeze(Merveille)
 					<BinaryString name="Tags"></BinaryString>
 				</Properties>
 			</Item>
-			<Item class="ModuleScript" referent="RBX7f112bd267ac9cb2">
+			<Item class="ModuleScript" referent="RBXa6d640783857eb32">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
@@ -3178,7 +3197,7 @@ return table.freeze(Merveille)
 					<BinaryString name="Tags"></BinaryString>
 				</Properties>
 			</Item>
-			<Item class="ModuleScript" referent="RBX63a730872f6102c9">
+			<Item class="ModuleScript" referent="RBXb66d36a209534576">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
@@ -3265,7 +3284,7 @@ return table.freeze(Merveille)
 					<BinaryString name="Tags"></BinaryString>
 				</Properties>
 			</Item>
-			<Item class="ModuleScript" referent="RBX6b0d10022ae4ca23">
+			<Item class="ModuleScript" referent="RBX5ece186d402e7a3b">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
@@ -3500,7 +3519,7 @@ return table.freeze(Merveille)
 					<BinaryString name="Tags"></BinaryString>
 				</Properties>
 			</Item>
-			<Item class="ModuleScript" referent="RBX02e9c24e4a845f55">
+			<Item class="ModuleScript" referent="RBXab9deb354edf5b86">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
@@ -3626,15 +3645,13 @@ return table.freeze(Merveille)
 					<BinaryString name="Tags"></BinaryString>
 				</Properties>
 			</Item>
-			<Item class="ModuleScript" referent="RBXb655f6bfbae35071">
+			<Item class="ModuleScript" referent="RBX23d386fb398798a2">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
 					<bool name="DefinesCapabilities">false</bool>
 					<string name="Name">Store</string>
-					<ProtectedString name="Source">--!strict
-		
-		local DataStoreService = game:GetService("DataStoreService")
+					<ProtectedString name="Source">local DataStoreService = game:GetService("DataStoreService")
 		local MessagingService = game:GetService("MessagingService")
 		local HttpService = game:GetService("HttpService")
 		
@@ -3651,10 +3668,10 @@ return table.freeze(Merveille)
 		local PlaceId = game.PlaceId
 		local JobId = game.JobId
 		
-		local ACTIVE_WAKES: {[string]: any} = {}
-		local STORES: {[string]: any} = {}
-		local UPDATE_QUEUES: {[string]: {busy: boolean, list: {thread}}} = {}
-		local MAILBOX_ACKS: {[string]: number} = {}
+		local ACTIVE_WAKES: { [string]: any } = {}
+		local STORES: { [string]: any } = {}
+		local UPDATE_QUEUES: { [string]: { busy: boolean, list: { thread } } } = {}
+		local MAILBOX_ACKS: { [string]: number } = {}
 		
 		local MAILBOX_CONNECTED = false
 		local IS_CLOSING = false
@@ -3675,7 +3692,7 @@ return table.freeze(Merveille)
 			}
 		end
 		
-		local function recordPerf(counter: {[string]: number}, seconds: number, ok: boolean, bytes: number?)
+		local function recordPerf(counter: { [string]: number }, seconds: number, ok: boolean, bytes: number?)
 			counter.count += 1
 			if ok then
 				counter.ok += 1
@@ -3789,12 +3806,12 @@ return table.freeze(Merveille)
 		
 		local function encodeRecord(self: any, source: buffer): string
 			if self._vaultKey == nil then
-				return Codec.encode(source, self.Schema.PageBytes)
+				return Codec.encodeStorage(source, self.Schema.PageBytes)
 			end
 			local lane = self._vaultArena:take()
 			copyBuffer(lane, source, self.Schema.PageBytes)
 			Vault.sealRecord(lane, self._vaultKey, `{HttpService:GenerateGUID(false)}:{os.clock()}:{self.Name}`)
-			local encoded = Codec.encode(lane, self.Schema.PageBytes)
+			local encoded = Codec.encodeStorage(lane, self.Schema.PageBytes)
 			self._vaultArena:give(lane)
 			return encoded
 		end
@@ -3803,7 +3820,7 @@ return table.freeze(Merveille)
 			if self._perf.enabled then
 				self._perf.decodedBytes += payloadSize(payload)
 			end
-			local body = Codec.decode(payload, self.Schema.PageBytes)
+			local body = Codec.decodeStorage(payload, self.Schema.PageBytes)
 			local header = Wake.readHeader(body)
 			if header.sealed then
 				if self._vaultKey == nil then
@@ -3893,7 +3910,12 @@ return table.freeze(Merveille)
 						task.spawn(function()
 							wake:release("External")
 							if type(requesterJobId) == "string" and requesterJobId ~= "" and type(nonce) == "string" then
-								pcall(MessagingService.PublishAsync, MessagingService, topicForJob(requesterJobId), {2, storeName, key, nonce})
+								pcall(
+									MessagingService.PublishAsync,
+									MessagingService,
+									topicForJob(requesterJobId),
+									{ 2, storeName, key, nonce }
+								)
 							end
 						end)
 					end
@@ -3953,9 +3975,12 @@ return table.freeze(Merveille)
 			return fresh
 		end
 		
-		function Store.new(name: string, schema: any, options: {[string]: any}?)
+		function Store.new(name: string, schema: any, options: { [string]: any }?)
 			assert(type(name) == "string" and name ~= "", "[Merveille/Store] store name must be a non-empty string")
-			assert(type(schema) == "table" and schema.Hash ~= nil, "[Merveille/Store] store schema must be a compiled Merveille profile")
+			assert(
+				type(schema) == "table" and schema.Hash ~= nil,
+				"[Merveille/Store] store schema must be a compiled Merveille profile"
+			)
 		
 			ensureMailbox()
 			ensureAutosaveLoop()
@@ -3988,7 +4013,9 @@ return table.freeze(Merveille)
 			self._lastAutoSave = os.clock()
 			self._mockData = {}
 			self._vaultKey = if options and options.vaultKey ~= nil then Vault.key(options.vaultKey) else nil
-			self._vaultArena = if self._vaultKey ~= nil then Arena.new(schema.PageBytes, if options and options.vaultSlots ~= nil then options.vaultSlots else 2) else nil
+			self._vaultArena = if self._vaultKey ~= nil
+				then Arena.new(schema.PageBytes, if options and options.vaultSlots ~= nil then options.vaultSlots else 2)
+				else nil
 			self._dataStore = if self.Options.mock then nil else DataStoreService:GetDataStore(name)
 			self._perf = {
 				enabled = self.Options.profile,
@@ -4110,15 +4137,19 @@ return table.freeze(Merveille)
 			if self.Options.mock then
 				return
 			end
-			local payload = if kind == 1 then {1, self.Name, key, foreignJobId, nonce}
-				elseif kind == 2 then {2, self.Name, key, nonce}
-				else {3, self.Name, key}
+			local payload = if kind == 1
+				then { 1, self.Name, key, foreignJobId, nonce }
+				elseif kind == 2 then { 2, self.Name, key, nonce }
+				else { 3, self.Name, key }
 			pcall(MessagingService.PublishAsync, MessagingService, topicForJob(foreignJobId), payload)
 		end
 		
-		function Store:open(playerOrKey: any, _options: {[string]: any}?)
+		function Store:open(playerOrKey: any, _options: { [string]: any }?)
 			local key, player = resolveKey(playerOrKey)
-			assert(ACTIVE_WAKES[token(self.Name, key)] == nil, `[Merveille/Store] '{self.Name}/{key}' is already active on this server`)
+			assert(
+				ACTIVE_WAKES[token(self.Name, key)] == nil,
+				`[Merveille/Store] '{self.Name}/{key}' is already active on this server`
+			)
 			if IS_CLOSING or self.IsClosing then
 				return nil
 			end
@@ -4160,7 +4191,12 @@ return table.freeze(Merveille)
 					end
 		
 					local header = Wake.readHeader(body)
-					if header.active == false or header.ownerJobId == JobId or allowSteal or (header.lastSaveUnix &gt; 0 and (now - header.lastSaveUnix) &gt;= self.Options.assumeDead) then
+					if
+						header.active == false
+						or header.ownerJobId == JobId
+						or allowSteal
+						or (header.lastSaveUnix &gt; 0 and (now - header.lastSaveUnix) &gt;= self.Options.assumeDead)
+					then
 						Wake.seal(body, self.Schema, {
 							active = true,
 							sealed = self._vaultKey ~= nil,
@@ -4186,6 +4222,7 @@ return table.freeze(Merveille)
 					local wake = Wake.fromBuffer(self, key, player, claimedBody, true, false)
 					self:_registerWake(wake)
 					ACTIVE_LOAD_JOBS -= 1
+					finishOpen(true)
 					return wake
 				end
 		
@@ -4217,8 +4254,6 @@ return table.freeze(Merveille)
 				else
 					task.wait(if firstRetry then self.Options.firstRetry else self.Options.followRetry)
 				end
-		
-				firstRetr		end
 		
 				firstRetry = false
 				if os.clock() - started &gt;= self.Options.sessionSteal then
@@ -4323,6 +4358,7 @@ return table.freeze(Merveille)
 				wake:_clearDirty()
 			end
 		
+			finishSave(true)
 			return true
 		end
 		
@@ -4400,7 +4436,7 @@ return table.freeze(Merveille)
 			return false
 		end
 		
-		function Store:tryVeille(playerOrKey: any, options: {[string]: any}?)
+		function Store:tryVeille(playerOrKey: any, options: { [string]: any }?)
 			local ok, wake = pcall(self.veille, self, playerOrKey, options)
 			if not ok then
 				return Result.err(wake)
@@ -4408,7 +4444,7 @@ return table.freeze(Merveille)
 			return if wake ~= nil then Result.ok(wake) else Result.err("OpenFailed")
 		end
 		
-		function Store:matchVeille(playerOrKey: any, onOk: (any) -&gt; any, onErr: (any) -&gt; any, options: {[string]: any}?)
+		function Store:matchVeille(playerOrKey: any, onOk: (any) -&gt; any, onErr: (any) -&gt; any, options: { [string]: any }?)
 			return self:tryVeille(playerOrKey, options):match(onOk, onErr)
 		end
 		
@@ -4436,11 +4472,11 @@ return table.freeze(Merveille)
 			return self:trySever(playerOrKey, force):match(onOk, onErr)
 		end
 		
-		function Store:veille(playerOrKey: any, options: {[string]: any}?)
+		function Store:veille(playerOrKey: any, options: { [string]: any }?)
 			return self:open(playerOrKey, options)
 		end
 		
-		function Store:wake(playerOrKey: any, options: {[string]: any}?)
+		function Store:wake(playerOrKey: any, options: { [string]: any }?)
 			return self:veille(playerOrKey, options)
 		end
 		
@@ -4465,13 +4501,12 @@ return table.freeze(Merveille)
 		end
 		
 		return Store
-		e
 		</ProtectedString>
 					<int64 name="SourceAssetId">-1</int64>
 					<BinaryString name="Tags"></BinaryString>
 				</Properties>
 			</Item>
-			<Item class="ModuleScript" referent="RBX3dc108e55418c66b">
+			<Item class="ModuleScript" referent="RBX79668b89100995d2">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
@@ -4542,7 +4577,7 @@ return table.freeze(Merveille)
 					<BinaryString name="Tags"></BinaryString>
 				</Properties>
 			</Item>
-			<Item class="ModuleScript" referent="RBX0a0d49f54b052421">
+			<Item class="ModuleScript" referent="RBXfb915989a63c0399">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
@@ -4888,7 +4923,7 @@ return table.freeze(Merveille)
 					<BinaryString name="Tags"></BinaryString>
 				</Properties>
 			</Item>
-			<Item class="ModuleScript" referent="RBX3c589711c5d90830">
+			<Item class="ModuleScript" referent="RBXf846905faf8ffb89">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
@@ -5070,7 +5105,7 @@ return table.freeze(Merveille)
 					<BinaryString name="Tags"></BinaryString>
 				</Properties>
 			</Item>
-			<Item class="ModuleScript" referent="RBX2b7839c7519b32d6">
+			<Item class="ModuleScript" referent="RBXd9ee620ca4a0568c">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
@@ -6476,7 +6511,7 @@ return table.freeze(Merveille)
 					<BinaryString name="Tags"></BinaryString>
 				</Properties>
 			</Item>
-			<Item class="ModuleScript" referent="RBXb71aaefa296968dc">
+			<Item class="ModuleScript" referent="RBXe03c2cc7cc8307d0">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
@@ -6558,7 +6593,7 @@ return table.freeze(Merveille)
 				</Properties>
 			</Item>
 		</Item>
-		<Item class="Folder" referent="RBX5163ba1ca64f0933">
+		<Item class="Folder" referent="RBX775c687c364359f5">
 			<Properties>
 				<BinaryString name="AttributesSerialize"></BinaryString>
 				<SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
@@ -6567,12 +6602,12 @@ return table.freeze(Merveille)
 				<int64 name="SourceAssetId">-1</int64>
 				<BinaryString name="Tags"></BinaryString>
 			</Properties>
-			<Item class="ModuleScript" referent="RBX47e585cc59ae1c15">
+			<Item class="Script" referent="RBX9fedb1c8b4228811">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
 					<bool name="DefinesCapabilities">false</bool>
-					<string name="Name">Boot.server</string>
+					<string name="Name">Boot</string>
 					<ProtectedString name="Source">--!strict
 		
 		local ServerStorage = game:GetService("ServerStorage")
@@ -6622,12 +6657,12 @@ return table.freeze(Merveille)
 					<BinaryString name="Tags"></BinaryString>
 				</Properties>
 			</Item>
-			<Item class="ModuleScript" referent="RBX3cf1917e0492aeea">
+			<Item class="Script" referent="RBX1a84b66d51007968">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
 					<bool name="DefinesCapabilities">false</bool>
-					<string name="Name">Lint.server</string>
+					<string name="Name">Lint</string>
 					<ProtectedString name="Source">--!strict
 		
 		local ServerStorage = game:GetService("ServerStorage")
@@ -6693,12 +6728,12 @@ return table.freeze(Merveille)
 					<BinaryString name="Tags"></BinaryString>
 				</Properties>
 			</Item>
-			<Item class="ModuleScript" referent="RBX570838aa64fc4503">
+			<Item class="LocalScript" referent="RBX0ab234a039eafd2f">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
 					<bool name="DefinesCapabilities">false</bool>
-					<string name="Name">Miroir.client</string>
+					<string name="Name">Miroir</string>
 					<ProtectedString name="Source">--!strict
 		
 		local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -6726,12 +6761,12 @@ return table.freeze(Merveille)
 					<BinaryString name="Tags"></BinaryString>
 				</Properties>
 			</Item>
-			<Item class="ModuleScript" referent="RBXc0a2aface43b05f1">
+			<Item class="Script" referent="RBX3a9c699ad389c63f">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
 					<bool name="DefinesCapabilities">false</bool>
-					<string name="Name">Miroir.server</string>
+					<string name="Name">Miroir</string>
 					<ProtectedString name="Source">--!strict
 		
 		local Players = game:GetService("Players")
@@ -6793,12 +6828,12 @@ return table.freeze(Merveille)
 					<BinaryString name="Tags"></BinaryString>
 				</Properties>
 			</Item>
-			<Item class="ModuleScript" referent="RBXee8d94f310aaec95">
+			<Item class="LocalScript" referent="RBXaeecfdd2d2057d39">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
 					<bool name="DefinesCapabilities">false</bool>
-					<string name="Name">Phase4.client</string>
+					<string name="Name">Phase4</string>
 					<ProtectedString name="Source">--!strict
 		
 		local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -6830,12 +6865,12 @@ return table.freeze(Merveille)
 					<BinaryString name="Tags"></BinaryString>
 				</Properties>
 			</Item>
-			<Item class="ModuleScript" referent="RBXfb6b5f14feecc82a">
+			<Item class="Script" referent="RBX879cdfe8c1cdf8e9">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
 					<bool name="DefinesCapabilities">false</bool>
-					<string name="Name">Phase4.server</string>
+					<string name="Name">Phase4</string>
 					<ProtectedString name="Source">--!strict
 		
 		local ServerStorage = game:GetService("ServerStorage")
@@ -6891,7 +6926,7 @@ return table.freeze(Merveille)
 					<BinaryString name="Tags"></BinaryString>
 				</Properties>
 			</Item>
-			<Item class="ModuleScript" referent="RBXd0e94a251bd11639">
+			<Item class="ModuleScript" referent="RBXd932a5bb9ec366bf">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
@@ -6958,12 +6993,12 @@ return table.freeze(Merveille)
 					<BinaryString name="Tags"></BinaryString>
 				</Properties>
 			</Item>
-			<Item class="ModuleScript" referent="RBX3eb8dcc93664bc85">
+			<Item class="Script" referent="RBX6cae07a0e85ad1b7">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
 					<bool name="DefinesCapabilities">false</bool>
-					<string name="Name">Profiler.server</string>
+					<string name="Name">Profiler</string>
 					<ProtectedString name="Source">--!strict
 		
 		local ServerStorage = game:GetService("ServerStorage")
@@ -7002,7 +7037,7 @@ return table.freeze(Merveille)
 				</Properties>
 			</Item>
 		</Item>
-		<Item class="Folder" referent="RBXbf2d2ff50b4f1167">
+		<Item class="Folder" referent="RBX82752ad1c15ee794">
 			<Properties>
 				<BinaryString name="AttributesSerialize"></BinaryString>
 				<SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
@@ -7011,12 +7046,12 @@ return table.freeze(Merveille)
 				<int64 name="SourceAssetId">-1</int64>
 				<BinaryString name="Tags"></BinaryString>
 			</Properties>
-			<Item class="ModuleScript" referent="RBX36df92fca35b9a47">
+			<Item class="Script" referent="RBXf06445e067ffc3e3">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
 					<bool name="DefinesCapabilities">false</bool>
-					<string name="Name">LintValidation.server</string>
+					<string name="Name">LintValidation</string>
 					<ProtectedString name="Source">--!strict
 		
 		local Merveille = require(script.Parent.Parent)
@@ -7174,12 +7209,12 @@ return table.freeze(Merveille)
 					<BinaryString name="Tags"></BinaryString>
 				</Properties>
 			</Item>
-			<Item class="ModuleScript" referent="RBXcf6bd076117d841e">
+			<Item class="Script" referent="RBX23e5fec225120bc3">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
 					<bool name="DefinesCapabilities">false</bool>
-					<string name="Name">PacketValidation.server</string>
+					<string name="Name">PacketValidation</string>
 					<ProtectedString name="Source">--!strict
 		
 		local Merveille = require(script.Parent.Parent)
@@ -7354,12 +7389,12 @@ return table.freeze(Merveille)
 					<BinaryString name="Tags"></BinaryString>
 				</Properties>
 			</Item>
-			<Item class="ModuleScript" referent="RBXda8261ffa5833647">
+			<Item class="Script" referent="RBX523055f19655ece8">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
 					<bool name="DefinesCapabilities">false</bool>
-					<string name="Name">ProfilerValidation.server</string>
+					<string name="Name">ProfilerValidation</string>
 					<ProtectedString name="Source">--!strict
 		
 		local Merveille = require(script.Parent.Parent)

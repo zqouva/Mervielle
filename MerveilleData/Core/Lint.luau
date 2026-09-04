@@ -1,5 +1,3 @@
---!strict
-
 -->	["lint"]
 -->	Data linting for reliquary definitions.
 -->	Modes:
@@ -301,7 +299,9 @@ local function validateScalarDefault(report: any, scalar: string, value: any, pa
 		addIssue(report, "error", "default-integer", `default for {scalar} must be an integer`, path)
 		return
 	end
-	if limit ~= nil and (value < limit.min or value > limit.max) then
+	local minValue = if limit ~= nil then limit.min else nil
+	local maxValue = if limit ~= nil then limit.max else nil
+	if (minValue ~= nil and value < minValue) or (maxValue ~= nil and value > maxValue) then
 		addIssue(report, "error", "default-range", `default for {scalar} is out of range`, path)
 		return
 	end

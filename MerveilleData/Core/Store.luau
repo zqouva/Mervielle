@@ -1,5 +1,3 @@
---!strict
-
 local DataStoreService = game:GetService("DataStoreService")
 local MessagingService = game:GetService("MessagingService")
 local HttpService = game:GetService("HttpService")
@@ -17,10 +15,10 @@ Store.__index = Store
 local PlaceId = game.PlaceId
 local JobId = game.JobId
 
-local ACTIVE_WAKES: {[string]: any} = {}
-local STORES: {[string]: any} = {}
-local UPDATE_QUEUES: {[string]: {busy: boolean, list: {thread}}} = {}
-local MAILBOX_ACKS: {[string]: number} = {}
+local ACTIVE_WAKES: { [string]: any } = {}
+local STORES: { [string]: any } = {}
+local UPDATE_QUEUES: { [string]: { busy: boolean, list: { thread } } } = {}
+local MAILBOX_ACKS: { [string]: number } = {}
 
 local MAILBOX_CONNECTED = false
 local IS_CLOSING = false
@@ -41,7 +39,7 @@ local function newPerfCounter()
 	}
 end
 
-local function recordPerf(counter: {[string]: number}, seconds: number, ok: boolean, bytes: number?)
+local function recordPerf(counter: { [string]: number }, seconds: number, ok: boolean, bytes: number?)
 	counter.count += 1
 	if ok then
 		counter.ok += 1
@@ -155,12 +153,12 @@ end
 
 local function encodeRecord(self: any, source: buffer): string
 	if self._vaultKey == nil then
-		return Codec.encode(source, self.Schema.PageBytes)
+		return Codec.encodeStorage(source, self.Schema.PageBytes)
 	end
 	local lane = self._vaultArena:take()
 	copyBuffer(lane, source, self.Schema.PageBytes)
 	Vault.sealRecord(lane, self._vaultKey, `{HttpService:GenerateGUID(false)}:{os.clock()}:{self.Name}`)
-	local encoded = Codec.encode(lane, self.Schema.PageBytes)
+	local encoded = Codec.encodeStorage(lane, self.Schema.PageBytes)
 	self._vaultArena:give(lane)
 	return encoded
 end
@@ -169,7 +167,7 @@ local function decodeRecord(self: any, payload: any): (buffer?, string?)
 	if self._perf.enabled then
 		self._perf.decodedBytes += payloadSize(payload)
 	end
-	local body = Codec.decode(payload, self.Schema.PageBytes)
+	local body = Codec.decodeStorage(payload, self.Schema.PageBytes)
 	local header = Wake.readHeader(body)
 	if header.sealed then
 		if self._vaultKey == nil then
@@ -259,7 +257,12 @@ local function ensureMailbox()
 				task.spawn(function()
 					wake:release("External")
 					if type(requesterJobId) == "string" and requesterJobId ~= "" and type(nonce) == "string" then
-						pcall(MessagingService.PublishAsync, MessagingService, topicForJob(requesterJobId), {2, storeName, key, nonce})
+						pcall(
+							MessagingService.PublishAsync,
+							MessagingService,
+							topicForJob(requesterJobId),
+							{ 2, storeName, key, nonce }
+						)
 					end
 				end)
 			end
@@ -319,9 +322,12 @@ local function buildFreshBody(self: any, now: number): buffer
 	return fresh
 end
 
-function Store.new(name: string, schema: any, options: {[string]: any}?)
+function Store.new(name: string, schema: any, options: { [string]: any }?)
 	assert(type(name) == "string" and name ~= "", "[Merveille/Store] store name must be a non-empty string")
-	assert(type(schema) == "table" and schema.Hash ~= nil, "[Merveille/Store] store schema must be a compiled Merveille profile")
+	assert(
+		type(schema) == "table" and schema.Hash ~= nil,
+		"[Merveille/Store] store schema must be a compiled Merveille profile"
+	)
 
 	ensureMailbox()
 	ensureAutosaveLoop()
@@ -354,7 +360,9 @@ function Store.new(name: string, schema: any, options: {[string]: any}?)
 	self._lastAutoSave = os.clock()
 	self._mockData = {}
 	self._vaultKey = if options and options.vaultKey ~= nil then Vault.key(options.vaultKey) else nil
-	self._vaultArena = if self._vaultKey ~= nil then Arena.new(schema.PageBytes, if options and options.vaultSlots ~= nil then options.vaultSlots else 2) else nil
+	self._vaultArena = if self._vaultKey ~= nil
+		then Arena.new(schema.PageBytes, if options and options.vaultSlots ~= nil then options.vaultSlots else 2)
+		else nil
 	self._dataStore = if self.Options.mock then nil else DataStoreService:GetDataStore(name)
 	self._perf = {
 		enabled = self.Options.profile,
@@ -476,15 +484,19 @@ function Store:_publish(kind: number, key: string, foreignJobId: string, nonce: 
 	if self.Options.mock then
 		return
 	end
-	local payload = if kind == 1 then {1, self.Name, key, foreignJobId, nonce}
-		elseif kind == 2 then {2, self.Name, key, nonce}
-		else {3, self.Name, key}
+	local payload = if kind == 1
+		then { 1, self.Name, key, foreignJobId, nonce }
+		elseif kind == 2 then { 2, self.Name, key, nonce }
+		else { 3, self.Name, key }
 	pcall(MessagingService.PublishAsync, MessagingService, topicForJob(foreignJobId), payload)
 end
 
-function Store:open(playerOrKey: any, _options: {[string]: any}?)
+function Store:open(playerOrKey: any, _options: { [string]: any }?)
 	local key, player = resolveKey(playerOrKey)
-	assert(ACTIVE_WAKES[token(self.Name, key)] == nil, `[Merveille/Store] '{self.Name}/{key}' is already active on this server`)
+	assert(
+		ACTIVE_WAKES[token(self.Name, key)] == nil,
+		`[Merveille/Store] '{self.Name}/{key}' is already active on this server`
+	)
 	if IS_CLOSING or self.IsClosing then
 		return nil
 	end
@@ -526,7 +538,12 @@ function Store:open(playerOrKey: any, _options: {[string]: any}?)
 			end
 
 			local header = Wake.readHeader(body)
-			if header.active == false or header.ownerJobId == JobId or allowSteal or (header.lastSaveUnix > 0 and (now - header.lastSaveUnix) >= self.Options.assumeDead) then
+			if
+				header.active == false
+				or header.ownerJobId == JobId
+				or allowSteal
+				or (header.lastSaveUnix > 0 and (now - header.lastSaveUnix) >= self.Options.assumeDead)
+			then
 				Wake.seal(body, self.Schema, {
 					active = true,
 					sealed = self._vaultKey ~= nil,
@@ -552,6 +569,7 @@ function Store:open(playerOrKey: any, _options: {[string]: any}?)
 			local wake = Wake.fromBuffer(self, key, player, claimedBody, true, false)
 			self:_registerWake(wake)
 			ACTIVE_LOAD_JOBS -= 1
+			finishOpen(true)
 			return wake
 		end
 
@@ -583,8 +601,6 @@ function Store:open(playerOrKey: any, _options: {[string]: any}?)
 		else
 			task.wait(if firstRetry then self.Options.firstRetry else self.Options.followRetry)
 		end
-
-		firstRetr		end
 
 		firstRetry = false
 		if os.clock() - started >= self.Options.sessionSteal then
@@ -689,6 +705,7 @@ function Store:_saveWake(wake: any, releasing: boolean, _reason: string?): boole
 		wake:_clearDirty()
 	end
 
+	finishSave(true)
 	return true
 end
 
@@ -766,7 +783,7 @@ function Store:whisper(playerOrKey: any, _payload: any): boolean
 	return false
 end
 
-function Store:tryVeille(playerOrKey: any, options: {[string]: any}?)
+function Store:tryVeille(playerOrKey: any, options: { [string]: any }?)
 	local ok, wake = pcall(self.veille, self, playerOrKey, options)
 	if not ok then
 		return Result.err(wake)
@@ -774,7 +791,7 @@ function Store:tryVeille(playerOrKey: any, options: {[string]: any}?)
 	return if wake ~= nil then Result.ok(wake) else Result.err("OpenFailed")
 end
 
-function Store:matchVeille(playerOrKey: any, onOk: (any) -> any, onErr: (any) -> any, options: {[string]: any}?)
+function Store:matchVeille(playerOrKey: any, onOk: (any) -> any, onErr: (any) -> any, options: { [string]: any }?)
 	return self:tryVeille(playerOrKey, options):match(onOk, onErr)
 end
 
@@ -802,11 +819,11 @@ function Store:matchSever(playerOrKey: any, onOk: (any) -> any, onErr: (any) -> 
 	return self:trySever(playerOrKey, force):match(onOk, onErr)
 end
 
-function Store:veille(playerOrKey: any, options: {[string]: any}?)
+function Store:veille(playerOrKey: any, options: { [string]: any }?)
 	return self:open(playerOrKey, options)
 end
 
-function Store:wake(playerOrKey: any, options: {[string]: any}?)
+function Store:wake(playerOrKey: any, options: { [string]: any }?)
 	return self:veille(playerOrKey, options)
 end
 
@@ -831,4 +848,3 @@ function Store:message(playerOrKey: any, payload: any): boolean
 end
 
 return Store
-e
